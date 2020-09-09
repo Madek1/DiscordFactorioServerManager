@@ -35,9 +35,22 @@ bot.on('ready', () => {
 
   let status
 
-  async function play(connection, url) {
-    connection.play(await ytdl(url), { type: 'opus' });
-  }
+  const serverOn = [
+    'https://www.youtube.com/watch?v=gpe3nXpnAZc&ab_channel=NathanCoffee',
+    'https://www.youtube.com/watch?v=7nQ2oiVqKHw&ab_channel=Ballyweg',
+    'https://www.youtube.com/watch?v=2D-ZO2rGcSA&ab_channel=GamingSoundFX',
+    'https://www.youtube.com/watch?v=7lsdJDiJ0QE&ab_channel=Volix21',
+    'https://www.youtube.com/watch?v=iSBBsUld8zM&ab_channel=GuybrushThreepwood89'
+  ]
+
+  const serverOff = [
+    'https://www.youtube.com/watch?v=JncgoPKklVE&ab_channel=NFKDubstep',
+    'https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg',
+    'https://www.youtube.com/watch?v=BwSts2s4ba4&ab_channel=AdeliciousGeneve',
+    'https://www.youtube.com/watch?v=dwLCjZVEtpE&ab_channel=SathButtons',
+    'https://www.youtube.com/watch?v=_4vQ6ZQGdnE&ab_channel=ArtReazy',
+    'https://www.youtube.com/watch?v=-1qju6V1jLM&ab_channel=ZMOONCHILDlive'
+  ]
 
   setInterval(() => {
     axios.get(`${ip}/api/server/status`, {
@@ -53,7 +66,7 @@ bot.on('ready', () => {
           message = 'running - 🟢'
           if (!voiceChannel) return console.error("The channel does not exist!")
           voiceChannel.join().then(connection => {
-            connection.playStream(ytdl('https://www.youtube.com/watch?v=7nQ2oiVqKHw&ab_channel=Ballyweg'), {
+            connection.playStream(ytdl(serverOn[Math.floor(Math.random() * serverOn.length)]), {
               filter: "audioonly"
             }).on('end', () => {
               voiceChannel.leave()
@@ -66,7 +79,7 @@ bot.on('ready', () => {
           message = 'stopped - 🔴'
           if (!voiceChannel) return console.error("The channel does not exist!")
           voiceChannel.join().then(connection => {
-            connection.playStream(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg'), {
+            connection.playStream(ytdl(serverOff[Math.floor(Math.random() * serverOff.length)]), {
               filter: "audioonly"
             }).on('end', () => {
               voiceChannel.leave()
