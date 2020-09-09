@@ -48,7 +48,7 @@ bot.on('ready', () => {
         if (data.status === 'running') {
           message = 'running - 🟢'
           if (!voiceChannel) return console.error("The channel does not exist!");
-          voiceChannel.join().then(connection => {
+          voiceChannel.join().then(({connection}) => {
             connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg')).on('finish', () => {
               voiceChannel.leave()
             })
