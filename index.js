@@ -35,6 +35,10 @@ bot.on('ready', () => {
 
   let status
 
+  async function play(connection, url) {
+    connection.play(await ytdl(url), { type: 'opus' });
+  }
+
   setInterval(() => {
     axios.get(`${ip}/api/server/status`, {
       jar: cookieJar,
@@ -44,24 +48,21 @@ bot.on('ready', () => {
       let message
       if (status != data.status) {
         status = data.status
-        const voiceChannel = bot.channels.get('742490683696480285')
+        const voiceChannel = bot.channels.get('399955348871708674')
         if (data.status === 'running') {
           message = 'running - 🟢'
-          if (!voiceChannel) return console.error("The channel does not exist!");
-          voiceChannel.join().then(({connection}) => {
-            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg')).on('finish', () => {
+        } else {
+          message = 'stopped - 🔴'
+          if (!voiceChannel) return console.error("The channel does not exist!")
+          voiceChannel.join().then(connection => {
+            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg'), {
+              filter: "audioonly"
+            }).on('end', () => {
               voiceChannel.leave()
             })
           }).catch(e => {
             // Oh no, it errored! Let's log it to console :)
-            console.error(e);
-          });
-        } else {
-          message = 'stopped - 🔴'
-          voiceChannel.join().then(connection => {
-            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg')).on('finish', () => {
-              voiceChannel.leave()
-            })
+            console.error(e)
           })
           
         }
