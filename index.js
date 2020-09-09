@@ -3,6 +3,9 @@ const Discord = require('discord.js')
 const bot = new Discord.Client()
 const TOKEN = process.env.TOKEN
 
+require('ffmpeg')
+const ytdl = require("ytdl-core")
+
 const axios = require('axios').default
 const axiosCookieJarSupport = require('axios-cookiejar-support').default
 const tough = require('tough-cookie')
@@ -16,6 +19,55 @@ bot.login(TOKEN)
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user.tag}!`)
   bot.user.setUsername('Factorio Server Manager')
+  
+  /* Login to the FSM */
+  axios.post(`${ip}/api/login`, {
+    username: 'admin',
+    password: 'admin'
+  }, {
+    jar: cookieJar,
+    withCredentials: true
+  }).then(res => {
+    bot.channels.get('752942899427016875').send(createEmbed('!fsm login', [{ name: 'Server response', value: 'Logged in' }]))
+  })
+
+  /* Server status controller */
+
+  let status
+
+  setInterval(() => {
+    axios.get(`${ip}/api/server/status`, {
+      jar: cookieJar,
+      withCredentials: true
+    }).then(res => {
+      const {data} = res.data
+      let message
+      if (status != data.status) {
+        status = data.status
+        const voiceChannel = bot.channels.get('742490683696480285')
+        if (data.status === 'running') {
+          message = 'running - 🟢'
+          if (!voiceChannel) return console.error("The channel does not exist!");
+          voiceChannel.join().then(connection => {
+            // Yay, it worked!
+            console.log("Successfully connected.");
+          }).catch(e => {
+            // Oh no, it errored! Let's log it to console :)
+            console.error(e);
+          });
+        } else {
+          message = 'stopped - 🔴'
+          voiceChannel.join().then(connection => {
+            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg')).on('finish', () => {
+              voiceChannel.leave()
+            })
+          })
+          
+        }
+        bot.channels.get('752942899427016875').send(createEmbed('!fsm status', [{ name: 'Server status', value: message }]))
+      }
+    })
+  }, 1000)
 });
 
 /* Embed */
@@ -37,7 +89,6 @@ const createEmbed = (command, fields) => {
 bot.on('message', msg => {
   if (msg.content.startsWith('!fsm')) {
     const message = msg.content.split(' ')
-    console.log(message)
 
     if (message.length > 1) {
       const command = message[1]
@@ -74,23 +125,12 @@ bot.on('message', msg => {
 
 let ip = 'http://34.91.102.185:8080'
 
-/* Login to the FSM */
-axios.post(`${ip}/api/login`, {
-  username: 'discordbot',
-  password: ''
-}, {
-  jar: cookieJar,
-  withCredentials: true
-}).then(res => {
-  bot.channels.get('752942899427016875').send(createEmbed('!fsm login', [{ name: 'Server response', value: 'Logged in' }]))
-})
-
 const login = (msg) => {
   if (msg.member._roles.includes('752949908259995708')) {
     port = parseInt(port)
     axios.post(`${ip}/api/login`, {
-      username: 'discordbot',
-      password: 'f#R#0FJftes6SD^&F^&T#R#W'
+      username: 'admin',
+      password: 'admin'
     }, {
       jar: cookieJar,
       withCredentials: true
@@ -131,6 +171,22 @@ const getStatus= (msg) => {
     msg.channel.send(createEmbed(msg.content, [{ name: 'Server status', value: message }]))
   })
 }
+
+const compare = (a, b) => {
+  if ( a.last_mod < b.last_mod ){
+    return -1;
+  }
+  if ( a.last_mod > b.last_mod ){
+    return 1;
+  }
+  return 0;
+}
+
+const formatDate = (date) => {
+  date = new Date(date)
+  return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds}`
+}
+
 const savesList = (msg) => {
   if (msg.member._roles.includes('752949908259995708')) {
     axios.get(`${ip}/api/saves/list`, {
@@ -138,10 +194,10 @@ const savesList = (msg) => {
       withCredentials: true
     }).then(res => {
       const {data} = res.data
-
+      data = data.sort(compare)
       let fields = []
       data.forEach(save => {
-        fields.push({ name: save.name, value: `${save.last_mod} - ${(save.size / 1024 / 1024).toFixed(3)}MB` })
+        fields.push({ name: save.name, value: `${formatDate(save.last_mod)} - ${(save.size / 1024 / 1024).toFixed(3)}MB` })
       })
       msg.channel.send(createEmbed(msg.content, fields))
     })
@@ -177,26 +233,3 @@ const stopServer = (msg) => {
     msg.channel.send(createEmbed(msg.content, [{ name: 'Permission denied', value: 'You must be FSM administrator' }]))
   }
 }
-
-/* Server status controller */
-
-let status
-
-setInterval(() => {
-  axios.get(`${ip}/api/server/status`, {
-    jar: cookieJar,
-    withCredentials: true
-  }).then(res => {
-    const {data} = res.data
-    let message
-    if (status != data.status) {
-      status = data.status
-      if (data.status === 'running') {
-        message = 'running - 🟢'
-      } else {
-        message = 'stopped - 🔴'
-      }
-      bot.channels.get('752942899427016875').send(createEmbed('!fsm status', [{ name: 'Server status', value: message }]))
-    }
-  })
-}, 1000)
