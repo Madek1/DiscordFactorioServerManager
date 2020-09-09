@@ -48,7 +48,7 @@ bot.on('ready', () => {
       let message
       if (status != data.status) {
         status = data.status
-        const voiceChannel = bot.channels.get('742490683696480285')
+        const voiceChannel = bot.channels.get('399955348871708674')
         if (data.status === 'running') {
           message = 'running - 🟢'
           if (!voiceChannel) return console.error("The channel does not exist!")
