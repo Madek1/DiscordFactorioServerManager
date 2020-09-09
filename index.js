@@ -49,7 +49,8 @@ bot.on('ready', () => {
     'https://www.youtube.com/watch?v=BwSts2s4ba4&ab_channel=AdeliciousGeneve',
     'https://www.youtube.com/watch?v=dwLCjZVEtpE&ab_channel=SathButtons',
     'https://www.youtube.com/watch?v=_4vQ6ZQGdnE&ab_channel=ArtReazy',
-    'https://www.youtube.com/watch?v=-1qju6V1jLM&ab_channel=ZMOONCHILDlive'
+    'https://www.youtube.com/watch?v=-1qju6V1jLM&ab_channel=ZMOONCHILDlive',
+    'https://www.youtube.com/watch?v=HoBa2SyvtpE&ab_channel=Euan'
   ]
 
   setInterval(() => {
