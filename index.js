@@ -23,7 +23,7 @@ bot.on('ready', () => {
   /* Login to the FSM */
   axios.post(`${ip}/api/login`, {
     username: 'admin',
-    password: 'admin'
+    password: 'factorio'
   }, {
     jar: cookieJar,
     withCredentials: true
@@ -49,8 +49,9 @@ bot.on('ready', () => {
           message = 'running - 🟢'
           if (!voiceChannel) return console.error("The channel does not exist!");
           voiceChannel.join().then(connection => {
-            // Yay, it worked!
-            console.log("Successfully connected.");
+            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg')).on('finish', () => {
+              voiceChannel.leave()
+            })
           }).catch(e => {
             // Oh no, it errored! Let's log it to console :)
             console.error(e);
@@ -130,7 +131,7 @@ const login = (msg) => {
     port = parseInt(port)
     axios.post(`${ip}/api/login`, {
       username: 'admin',
-      password: 'admin'
+      password: 'factorio'
     }, {
       jar: cookieJar,
       withCredentials: true
