@@ -53,7 +53,7 @@ bot.on('ready', () => {
           message = 'running - 🟢'
           if (!voiceChannel) return console.error("The channel does not exist!")
           voiceChannel.join().then(connection => {
-            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg'), {
+            connection.playStream(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg'), {
               filter: "audioonly"
             }).on('end', () => {
               voiceChannel.leave()
@@ -66,7 +66,7 @@ bot.on('ready', () => {
           message = 'stopped - 🔴'
           if (!voiceChannel) return console.error("The channel does not exist!")
           voiceChannel.join().then(connection => {
-            connection.play(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg'), {
+            connection.playStream(ytdl('https://www.youtube.com/watch?v=Gb2jGy76v0Y&ab_channel=Ballyweg'), {
               filter: "audioonly"
             }).on('end', () => {
               voiceChannel.leave()
